@@ -1,0 +1,12 @@
+main: com.kzics.mdungeons.MysticDungeons
+name: Dungeons
+version: 1.0
+commands:
+    dungeon:
+        description: Dungeon command
+        usage: /dungeon <create|delete|list>
+        aliases: [d]
+    mobspawn:
+        description: Mobspawn command
+        usage: /mobspawn <create|delete|list>
+        aliases: [ms]

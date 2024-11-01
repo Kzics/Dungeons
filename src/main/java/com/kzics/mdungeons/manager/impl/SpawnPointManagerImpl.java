@@ -3,10 +3,12 @@ package com.kzics.mdungeons.manager.impl;
 import com.kzics.mdungeons.manager.SpawnPointManager;
 import com.kzics.mdungeons.mobs.MobProperties;
 import com.kzics.mdungeons.mobs.SpawnPoint;
+import com.kzics.mdungeons.utils.WorldEditUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,10 +22,10 @@ public class SpawnPointManagerImpl implements SpawnPointManager {
         this.config = config;
     }
     @Override
-    public void setSpawnPoint(MobProperties mobProperties, int spawnInterval, int radius) {
-        // Utiliser WorldEdit pour obtenir la sélection
-        Location location = getWorldEditSelection();
-        spawnPoints.put(mobProperties.name(), new SpawnPoint(mobProperties, spawnInterval, radius, location));
+    public void setSpawnPoint(MobProperties mobProperties, int spawnInterval, int radius, Player player) {
+        Location selection = WorldEditUtil.getPlayerSelection(player);
+
+        spawnPoints.put(mobProperties.name(), new SpawnPoint(mobProperties, spawnInterval, radius, selection));
     }
 
     @Override
@@ -36,10 +38,6 @@ public class SpawnPointManagerImpl implements SpawnPointManager {
         return new ArrayList<>(spawnPoints.values());
     }
 
-    private Location getWorldEditSelection() {
-        // Implémentation pour obtenir la sélection WorldEdit
-        return null;
-    }
 
     private void loadSpawnPoints() {
         if (config.isConfigurationSection("spawnPoints")) {
