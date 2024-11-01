@@ -22,10 +22,12 @@ public class SpawnPointManagerImpl implements SpawnPointManager {
         this.config = config;
     }
     @Override
-    public void setSpawnPoint(MobProperties mobProperties, int spawnInterval, int radius, Player player) {
+    public boolean setSpawnPoint(MobProperties mobProperties, int spawnInterval, int radius, Player player) {
         Location selection = WorldEditUtil.getPlayerSelection(player);
 
-        spawnPoints.put(mobProperties.name(), new SpawnPoint(mobProperties, spawnInterval, radius, selection));
+        if(selection == null) return false;
+        spawnPoints.put(mobProperties.name(), new SpawnPoint(selection, mobProperties, spawnInterval, radius));
+        return true;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class SpawnPointManagerImpl implements SpawnPointManager {
                 int radius = config.getInt(path + ".radius");
                 Location location = new Location(Bukkit.getWorld(world), x, y, z);
                 MobProperties mobProperties = new MobProperties(EntityType.valueOf(mobType), name, 100, 10, new ArrayList<>());
-                spawnPoints.put(name, new SpawnPoint(mobProperties, spawnInterval, radius, location));
+                spawnPoints.put(name, new SpawnPoint(location, mobProperties, spawnInterval, radius));
             }
         }
     }

@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public interface SpawnPointManager {
-    void setSpawnPoint(MobProperties mobProperties, int spawnInterval, int radius, Player player);
+    boolean setSpawnPoint(MobProperties mobProperties, int spawnInterval, int radius, Player player);
     void removeSpawnPoint(String name);
     List<SpawnPoint> listSpawnPoints();
 }

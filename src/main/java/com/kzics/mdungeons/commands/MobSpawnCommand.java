@@ -2,6 +2,8 @@ package com.kzics.mdungeons.commands;
 
 import com.kzics.mdungeons.manager.SpawnPointManager;
 import com.kzics.mdungeons.mobs.MobProperties;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,17 +22,17 @@ public class MobSpawnCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("Only players can use this command.");
+            sender.sendMessage(Component.text("Only players can use this command.", NamedTextColor.RED));
             return true;
         }
 
         if (args.length < 5) {
-            player.sendMessage("Usage: /mobspawn set <mobType> <name> <spawnInterval> <radius>");
+            player.sendMessage(Component.text("Usage: /mobspawn set <mobType> <name> <spawnInterval> <radius>", NamedTextColor.RED));
             return true;
         }
         String subCommand = args[0].toLowerCase();
         if (!subCommand.equals("set")) {
-            player.sendMessage("Usage: /mobspawn set <mobType> <name> <spawnInterval> <radius>");
+            player.sendMessage(Component.text("Usage: /mobspawn set <mobType> <name> <spawnInterval> <radius>", NamedTextColor.RED));
             return true;
         }
 
@@ -40,9 +42,11 @@ public class MobSpawnCommand implements CommandExecutor {
         int radius = Integer.parseInt(args[4]);
 
         MobProperties mobProperties = new MobProperties(EntityType.valueOf(mobType.toUpperCase()), name, 100, 10, new ArrayList<>());
-        spawnPointManager.setSpawnPoint(mobProperties, spawnInterval, radius, player);
-        player.sendMessage("Spawn point set for " + name + " at your WorldEdit selection.");
-
+        if(spawnPointManager.setSpawnPoint(mobProperties, spawnInterval, radius, player)) {
+            player.sendMessage(Component.text("Spawn point set for " + name + " at your WorldEdit selection.", NamedTextColor.GREEN));
+        }else {
+            player.sendMessage(Component.text("You need to make a WorldEdit selection first!", NamedTextColor.RED));
+        }
         return true;
 
     }
