@@ -6,10 +6,9 @@ public class SpawnPoint {
 
     private final Location location;
     private final MobProperties mobProperties;
-    private final int spawnInterval;
-    private final int radius;
+    private int spawnInterval;
+    private int radius;
     private long lastSpawn;
-
 
     public SpawnPoint(Location location, MobProperties mobProperties, int spawnInterval, int radius) {
         this.location = location;
@@ -39,7 +38,15 @@ public class SpawnPoint {
         return spawnInterval;
     }
 
+    public void setSpawnInterval(int spawnInterval) {
+        this.spawnInterval = spawnInterval;
+    }
+
     public int radius() {
         return radius;
+    }
+
+    public void setRadius(int radius) {
+        this.radius = radius;
     }
 }

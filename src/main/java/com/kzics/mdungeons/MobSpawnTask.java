@@ -44,7 +44,7 @@ public class MobSpawnTask extends BukkitRunnable {
         Location location = getRandomLocationWithinRadius(spawnPoint);
         EntityType type = spawnPoint.mobProperties().type();
         LivingEntity entity = (LivingEntity) spawnPoint.location().getWorld().spawnEntity(location, type);
-        entity.customName(Component.text(spawnPoint.mobProperties().name()));
+        entity.customName(spawnPoint.mobProperties().name());
         AttributeInstance maxHealth = entity.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH);
         if (maxHealth != null) {
             maxHealth.setBaseValue(spawnPoint.mobProperties().health());

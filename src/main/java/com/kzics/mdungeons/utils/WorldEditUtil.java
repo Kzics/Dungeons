@@ -6,8 +6,6 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.session.PlacementType;
-import com.sk89q.worldedit.world.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,7 +14,6 @@ import org.bukkit.plugin.Plugin;
 public class WorldEditUtil {
 
     private static WorldEditPlugin getWorldEdit() {
-
         Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
         if (plugin instanceof WorldEditPlugin) {
             return (WorldEditPlugin) plugin;
@@ -25,7 +22,7 @@ public class WorldEditUtil {
         }
     }
 
-    public static Location getPlayerSelection(Player player) {
+    public static Location[] getPlayerSelection(Player player) {
         WorldEditPlugin worldEditPlugin = getWorldEdit();
         if (worldEditPlugin == null) {
             player.sendMessage("WorldEdit plugin not found!");
@@ -33,7 +30,7 @@ public class WorldEditUtil {
         }
 
         LocalSession localSession = worldEditPlugin.getSession(player);
-        Region selection = null;
+        Region selection;
         try {
             selection = localSession.getSelection(BukkitAdapter.adapt(player.getWorld()));
         } catch (IncompleteRegionException e) {
@@ -44,11 +41,11 @@ public class WorldEditUtil {
             return null;
         }
 
-        World weWorld = selection.getWorld();
         BlockVector3 minPoint = selection.getMinimumPoint();
+        BlockVector3 maxPoint = selection.getMaximumPoint();
+        Location loc1 = new Location(BukkitAdapter.adapt(selection.getWorld()), minPoint.x(), minPoint.y(), minPoint.z());
+        Location loc2 = new Location(BukkitAdapter.adapt(selection.getWorld()), maxPoint.x(), maxPoint.y(), maxPoint.z());
 
-        return new Location(BukkitAdapter.adapt(weWorld), minPoint.x(), minPoint.y(), minPoint.z());
+        return new Location[]{loc1, loc2};
     }
-
-
 }

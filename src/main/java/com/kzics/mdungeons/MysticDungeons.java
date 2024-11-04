@@ -11,8 +11,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class MysticDungeons extends JavaPlugin {
     private DungeonManager dungeonManager;
     private SpawnPointManager spawnPointManager;
+    private static MysticDungeons instance;
     @Override
     public void onEnable() {
+        instance = this;
         getLogger().info("MysticDungeons has been enabled!");
 
         dungeonManager = new DungeonManager(getConfig());
@@ -27,6 +29,10 @@ public class MysticDungeons extends JavaPlugin {
     @Override
     public void onDisable() {
         getLogger().info("MysticDungeons has been disabled!");
+    }
+
+    public static MysticDungeons getInstance() {
+        return instance;
     }
 
     public DungeonManager dungeonManager() {

@@ -46,13 +46,13 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 name = args[1];
-                Location selection = WorldEditUtil.getPlayerSelection(player);
-                if (selection == null) {
+                Location[] selection = WorldEditUtil.getPlayerSelection(player);
+                if (selection == null || selection.length < 2) {
                     player.sendMessage(Component.text("You need to make a WorldEdit selection first!").color(NamedTextColor.RED));
                     return true;
                 }
-                dungeonManager.setDungeon(name, selection);
-                player.sendMessage(Component.text("Dungeon " + name + " sucessfully created!", NamedTextColor.GREEN));
+                dungeonManager.setDungeon(name, selection[0], selection[1]);
+                player.sendMessage(Component.text("Dungeon " + name + " successfully created!", NamedTextColor.GREEN));
                 break;
 
             case "teleport":
@@ -61,7 +61,7 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 name = args[1];
-                Location dungeonLocation = dungeonManager.getDungeon(name).location();
+                Location dungeonLocation = dungeonManager.getDungeon(name).point1();
                 if (dungeonLocation == null) {
                     player.sendMessage(Component.text("Dungeon " + name + " not found.", NamedTextColor.RED));
                     return true;
@@ -93,5 +93,4 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
         }
         return null;
     }
-
 }
