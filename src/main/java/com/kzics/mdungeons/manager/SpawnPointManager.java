@@ -14,4 +14,6 @@ public interface SpawnPointManager {
     SpawnPoint getSpawnPoint(String name);
     Map<String, SpawnPoint> getSpawnPoints();
     void updateSpawnPointKey(String oldName, String newName);
+    void saveSpawnPoints();
+    void loadSpawnPoints();
 }

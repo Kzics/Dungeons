@@ -1,5 +1,6 @@
 package com.kzics.mdungeons.mobs;
 
+import com.kzics.mdungeons.MysticDungeons;
 import org.bukkit.inventory.ItemStack;
 
 public class Loot {
@@ -26,4 +27,5 @@ public class Loot {
     public void setDropChance(double dropChance) {
         this.dropChance = dropChance;
     }
+
 }

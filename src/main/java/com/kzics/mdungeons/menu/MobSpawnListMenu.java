@@ -80,14 +80,16 @@ public class MobSpawnListMenu extends MysticDungeonsMenu {
     private ItemStack createSpawnPointItem(SpawnPoint spawnPoint) {
         ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(Component.text("(✱) Mob: " + spawnPoint.mobProperties().name(), NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
+        String name = PlainTextComponentSerializer.plainText().serialize(spawnPoint.mobProperties().name());
+        meta.displayName(Component.text("(✱) Mob: " + name, NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
         meta.lore(List.of(
                 Component.empty(),
                 Component.text("✧ Name: ", NamedTextColor.WHITE).append(spawnPoint.mobProperties().name().color(NamedTextColor.GRAY)),
                 Component.text("✧ Health: ", NamedTextColor.WHITE).append(Component.text(spawnPoint.mobProperties().health(), NamedTextColor.GRAY)),
                 Component.text("✧ Damage: ", NamedTextColor.WHITE).append(Component.text(spawnPoint.mobProperties().damage(), NamedTextColor.GRAY)),
                 Component.text("✧ Spawn Interval: ", NamedTextColor.WHITE).append(Component.text(spawnPoint.spawnInterval(), NamedTextColor.GRAY)),
-                Component.text("✧ Radius: ", NamedTextColor.WHITE).append(Component.text(spawnPoint.radius(), NamedTextColor.GRAY))
+                Component.text("✧ Radius: ", NamedTextColor.WHITE).append(Component.text(spawnPoint.radius(), NamedTextColor.GRAY)),
+                Component.text("Shift-click to remove", NamedTextColor.RED)
         ));
         PlainTextComponentSerializer serializer = PlainTextComponentSerializer.plainText();
         meta.getPersistentDataContainer().set(SPAWN_POINT_KEY, PersistentDataType.STRING, serializer.serialize(spawnPoint.mobProperties().name()));
@@ -113,8 +115,14 @@ public class MobSpawnListMenu extends MysticDungeonsMenu {
             String mobName = clickedItem.getItemMeta().getPersistentDataContainer().get(SPAWN_POINT_KEY, PersistentDataType.STRING);
 
             if (mobName != null) {
-                SpawnPoint spawnPoint = spawnPointManager.getSpawnPoint(mobName);
-                new MobSpawnDetailMenu(spawnPoint).open(player);
+                if (event.isShiftClick()) {
+                    spawnPointManager.removeSpawnPoint(mobName);
+                    player.sendMessage(Component.text("Spawn point " + mobName + " removed.", NamedTextColor.RED));
+                    new MobSpawnListMenu(spawnPointManager, page).open(player);
+                } else {
+                    SpawnPoint spawnPoint = spawnPointManager.getSpawnPoint(mobName);
+                    new MobSpawnDetailMenu(spawnPoint).open(player);
+                }
             }
         }
     }
@@ -122,6 +130,4 @@ public class MobSpawnListMenu extends MysticDungeonsMenu {
     public static void addBorder(Inventory inventory) {
         DungeonsListMenu.addBorder(inventory);
     }
-
-
 }

@@ -1,7 +1,5 @@
 package com.kzics.mdungeons.menu;
 
-import com.kzics.mdungeons.Dungeon;
-import com.kzics.mdungeons.commands.DungeonCommand;
 import com.kzics.mdungeons.manager.DungeonManager;
 import com.kzics.mdungeons.utils.ItemBuilder;
 import net.kyori.adventure.text.Component;
@@ -19,6 +17,7 @@ public class DungeonsListMenu extends MysticDungeonsMenu {
     private final Inventory inventory;
     private static final NamespacedKey DUNGEON_KEY = new NamespacedKey("mdungeons", "dungeon");
     private final DungeonManager dungeonManager;
+
     public DungeonsListMenu(DungeonManager dungeonManager) {
         this.inventory = Bukkit.createInventory(this, 54, Component.text("Dungeons List"));
         this.dungeonManager = dungeonManager;
@@ -27,13 +26,15 @@ public class DungeonsListMenu extends MysticDungeonsMenu {
     public void open(Player player) {
         addBorder(inventory);
 
-        dungeonManager.listDungeons().forEach((name, dungeon)-> {
+        dungeonManager.listDungeons().forEach((name, dungeon) -> {
             ItemStack item = new ItemBuilder(Material.PAPER)
                     .addPersistentData(DUNGEON_KEY, name)
                     .setName(Component.text("(✱) ").color(NamedTextColor.GOLD)
                             .append(Component.text("Dungeon: " + name)))
-                    .setLore()
+                    .setLore(Component.empty(),
+                            Component.text("Shift click to remove").color(NamedTextColor.RED))
                     .build();
+
             inventory.addItem(item);
         });
         player.openInventory(inventory);
@@ -52,8 +53,14 @@ public class DungeonsListMenu extends MysticDungeonsMenu {
 
             Player player = (Player) event.getWhoClicked();
 
-            Bukkit.dispatchCommand(player, "dungeon teleport " + name);
-            player.closeInventory();
+            if (event.isShiftClick()) {
+                dungeonManager.removeDungeon(name);
+                player.sendMessage(Component.text("Dungeon " + name + " removed.", NamedTextColor.RED));
+                new DungeonsListMenu(dungeonManager).open(player);
+            } else {
+                Bukkit.dispatchCommand(player, "dungeon teleport " + name);
+                player.closeInventory();
+            }
         }
     }
 
@@ -73,6 +80,4 @@ public class DungeonsListMenu extends MysticDungeonsMenu {
             inventory.setItem(i * 9 + 8, blackPane);
         }
     }
-
-
 }

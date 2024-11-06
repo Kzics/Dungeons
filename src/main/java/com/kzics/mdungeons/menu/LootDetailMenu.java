@@ -1,10 +1,11 @@
 package com.kzics.mdungeons.menu;
 
+import com.kzics.mdungeons.menu.DungeonsListMenu;
+import com.kzics.mdungeons.menu.MysticDungeonsMenu;
 import com.kzics.mdungeons.mobs.Loot;
 import com.kzics.mdungeons.mobs.MobProperties;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -35,7 +36,9 @@ public class LootDetailMenu extends MysticDungeonsMenu {
     }
 
     private void setupMenu() {
+        inventory.clear(); // Vide l'inventaire pour éviter la duplication
         DungeonsListMenu.addBorder(inventory);
+
         List<Loot> loots = mobProperties.loot();
         for (Loot loot : loots) {
             inventory.addItem(createLootItem(loot));
@@ -64,11 +67,12 @@ public class LootDetailMenu extends MysticDungeonsMenu {
         Player player = (Player) event.getWhoClicked();
 
         if (event.getClickedInventory() == player.getInventory()) {
-
             Loot newLoot = new Loot(clickedItem, 0);
             mobProperties.loot().add(newLoot);
             player.sendMessage(Component.text("Item added to loot list.", NamedTextColor.GREEN));
-            setupMenu();
+
+            // Ajoute seulement le nouvel item au menu sans réinitialiser
+            inventory.addItem(createLootItem(newLoot));
             open(player);
         } else {
             String lootName = clickedItem.getItemMeta().getPersistentDataContainer().get(LOOT_KEY, PersistentDataType.STRING);
@@ -76,16 +80,20 @@ public class LootDetailMenu extends MysticDungeonsMenu {
             if (lootName != null) {
                 PlainTextComponentSerializer serializer = PlainTextComponentSerializer.plainText();
 
-                Loot loot = mobProperties.loot().stream().filter(l -> serializer.serialize(l.getItemStack().displayName()).equals(lootName)).findFirst().orElse(null);
+                Loot loot = mobProperties.loot().stream()
+                        .filter(l -> serializer.serialize(l.getItemStack().displayName()).equals(lootName))
+                        .findFirst()
+                        .orElse(null);
+
                 if (loot != null) {
                     if (event.isLeftClick()) {
                         loot.setDropChance(loot.getDropChance() + 1);
                     } else if (event.isRightClick()) {
-                        if(loot.getDropChance() == 0) return;
+                        if (loot.getDropChance() == 0) return;
                         loot.setDropChance(loot.getDropChance() - 1);
                     }
-                    open(player);
                     clickedItem.setItemMeta(createLootItem(loot).getItemMeta());
+                    open(player);
                 }
             }
         }

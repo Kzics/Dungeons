@@ -1,0 +1,2 @@
+player-join-dungeon: "{player} has joined the {name} dungeon!"
+player-quit-dungeon: "{player} has left the {name} dungeon!"

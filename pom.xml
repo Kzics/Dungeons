@@ -26,6 +26,11 @@
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
 
+        <repository>
+            <id>rosewood-repo</id>
+            <url>https://repo.rosewooddev.io/repository/public/</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -46,6 +51,13 @@
             <version>7.3.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.black_ixx</groupId>
+            <artifactId>playerpoints</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

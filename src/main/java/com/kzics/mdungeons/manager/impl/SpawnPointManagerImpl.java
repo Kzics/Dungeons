@@ -1,5 +1,6 @@
 package com.kzics.mdungeons.manager.impl;
 
+import com.kzics.mdungeons.MysticDungeons;
 import com.kzics.mdungeons.manager.SpawnPointManager;
 import com.kzics.mdungeons.mobs.MobProperties;
 import com.kzics.mdungeons.mobs.SpawnPoint;
@@ -9,7 +10,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,10 +26,10 @@ import java.util.Map;
 
 public class SpawnPointManagerImpl implements SpawnPointManager {
     private final Map<String, SpawnPoint> spawnPoints = new HashMap<>();
-    private final FileConfiguration config;
+    private final File file;
 
     public SpawnPointManagerImpl(FileConfiguration config) {
-        this.config = config;
+        this.file = new File(MysticDungeons.getInstance().getDataFolder(), "spawnpoints.json");
         loadSpawnPoints();
     }
 
@@ -46,7 +55,7 @@ public class SpawnPointManagerImpl implements SpawnPointManager {
     }
 
     @Override
-    public Map<String, SpawnPoint> getSpawnPoints() { // Implement this method
+    public Map<String, SpawnPoint> getSpawnPoints() {
         return spawnPoints;
     }
 
@@ -61,38 +70,34 @@ public class SpawnPointManagerImpl implements SpawnPointManager {
         return spawnPoints.get(name);
     }
 
-    private void loadSpawnPoints() {
-        if (config.isConfigurationSection("spawnPoints")) {
-            for (String key : config.getConfigurationSection("spawnPoints").getKeys(false)) {
-                String path = "spawnPoints." + key;
-                String name = config.getString(path + ".name");
-                String mobType = config.getString(path + ".mobType");
-                String world = config.getString(path + ".world");
-                double x = config.getDouble(path + ".x");
-                double y = config.getDouble(path + ".y");
-                double z = config.getDouble(path + ".z");
-                int spawnInterval = config.getInt(path + ".spawnInterval");
-                int radius = config.getInt(path + ".radius");
-                Location location = new Location(Bukkit.getWorld(world), x, y, z);
-               // MobProperties mobProperties = new MobProperties(EntityType.valueOf(mobType), name, 100, 10, new ArrayList<>());
-                //spawnPoints.put(name, new SpawnPoint(location, mobProperties, spawnInterval, radius));
+    public void loadSpawnPoints() {
+        if (!file.exists()) return;
+
+        try (FileReader reader = new FileReader(file)) {
+            JSONParser parser = new JSONParser();
+            JSONArray spawnPointArray = (JSONArray) parser.parse(reader);
+            for (Object obj : spawnPointArray) {
+                JSONObject spawnPointJson = (JSONObject) obj;
+                SpawnPoint spawnPoint = SpawnPoint.fromJson(spawnPointJson);
+                String name = PlainTextComponentSerializer.plainText().serialize(spawnPoint.mobProperties().name());
+                spawnPoints.put(name, spawnPoint);
             }
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
         }
     }
 
-    private void saveSpawnPoints() {
-        config.set("spawnPoints", null);
-        int index = 0;
+    public void saveSpawnPoints() {
+        JSONArray spawnPointArray = new JSONArray();
+
         for (SpawnPoint spawnPoint : spawnPoints.values()) {
-            String path = "spawnPoints." + index++;
-            config.set(path + ".name", spawnPoint.mobProperties().name());
-            config.set(path + ".mobType", spawnPoint.mobProperties().type().name());
-            config.set(path + ".world", spawnPoint.location().getWorld().getName());
-            config.set(path + ".x", spawnPoint.location().getX());
-            config.set(path + ".y", spawnPoint.location().getY());
-            config.set(path + ".z", spawnPoint.location().getZ());
-            config.set(path + ".spawnInterval", spawnPoint.spawnInterval());
-            config.set(path + ".radius", spawnPoint.radius());
+            spawnPointArray.add(spawnPoint.toJson());
+        }
+
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(spawnPointArray.toJSONString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -19,14 +19,17 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class DungeonsListener implements Listener {
 
     private final MysticDungeons mysticDungeons;
+    private Random random = new Random();
     public static final Map<Player, MobSpawnDetailMenu.UpdateContext> updateContexts = new HashMap<>();
 
     public DungeonsListener(MysticDungeons mysticDungeons) {
@@ -50,6 +53,7 @@ public class DungeonsListener implements Listener {
         if (entityName != null) {
             for (SpawnPoint spawnPoint : mysticDungeons.spawnPointManager().listSpawnPoints()) {
                 if (spawnPoint.mobProperties().name().equals(entityName)) {
+                    event.getDrops().clear();
                     handleLootDrop(entity, spawnPoint);
                     break;
                 }
@@ -58,19 +62,18 @@ public class DungeonsListener implements Listener {
     }
     private void handleLootDrop(LivingEntity entity, SpawnPoint spawnPoint) {
         List<Loot> loots = spawnPoint.mobProperties().loot();
-        double totalChance = loots.stream().mapToDouble(Loot::getDropChance).sum();
-        double randomValue = Math.random() * totalChance;
 
-        double cumulativeChance = 0.0;
         for (Loot loot : loots) {
-            cumulativeChance += loot.getDropChance();
-            if (randomValue <= cumulativeChance) {
-                entity.getWorld().dropItemNaturally(entity.getLocation(), loot.getItemStack());
+            double randomChance = random.nextDouble() * 100;
+
+            if (randomChance <= loot.getDropChance()) {
+                ItemStack item = loot.getItemStack();
+                item.setAmount(1);
+                entity.getWorld().dropItemNaturally(entity.getLocation(), item);
                 break;
             }
         }
     }
-
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
@@ -97,11 +100,16 @@ public class DungeonsListener implements Listener {
             boolean isInDungeon = dungeon.isPlayerInDungeon(event.getTo());
 
             if (!wasInDungeon && isInDungeon) {
-                dungeon.onPlayerEnter(player);
-                Bukkit.broadcast(Component.text(player.getName() + " est entré dans le donjon " + dungeon.name()));
+                String joinMessage = mysticDungeons.getConfig().getString("player-join-dungeon")
+                        .replace("{name}", dungeon.name())
+                        .replace("{player}", player.getName());
+                dungeon.onPlayerEnter(player, joinMessage);
             } else if (wasInDungeon && !isInDungeon) {
-                dungeon.onPlayerExit(player);
-                Bukkit.broadcast(Component.text(player.getName() + " a quitté le donjon " + dungeon.name()));
+                String leaveMessage = mysticDungeons.getConfig().getString("player-quit-dungeon")
+                        .replace("{name}", dungeon.name())
+                        .replace("{player}", player.getName());
+
+                dungeon.onPlayerExit(player, leaveMessage);
             }
         }
     }
