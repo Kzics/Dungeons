@@ -17,13 +17,18 @@ public class MobProperties {
     private int health;
     private int damage;
     private List<Loot> loot;
+    private double coinChance;
+    private int coinAmount;
 
-    public MobProperties(EntityType type, Component name, int health, int damage, List<Loot> loot) {
+
+    public MobProperties(EntityType type, Component name, int health, int damage, List<Loot> loot, double coinChance, int coinAmount) {
         this.type = type;
         this.name = name;
         this.health = health;
         this.damage = damage;
         this.loot = loot;
+        this.coinChance = coinChance;
+        this.coinAmount = coinAmount;
     }
 
     public JSONObject toJson() {
@@ -32,8 +37,9 @@ public class MobProperties {
         json.put("name", GsonComponentSerializer.gson().serialize(name));
         json.put("health", health);
         json.put("damage", damage);
+        json.put("coinChance", coinChance);
+        json.put("coinAmount", coinAmount);
 
-        // Convertir la liste de loot en JSON
         JSONArray lootArray = new JSONArray();
         for (Loot lootItem : loot) {
             JSONObject lootJson = new JSONObject();
@@ -47,6 +53,22 @@ public class MobProperties {
     }
     public Component name() {
         return name;
+    }
+
+    public double coinChance() {
+        return coinChance;
+    }
+
+    public void setCoinChance(double coinChance) {
+        this.coinChance = coinChance;
+    }
+
+    public int coinAmount() {
+        return coinAmount;
+    }
+
+    public void setCoinAmount(int coinAmount) {
+        this.coinAmount = coinAmount;
     }
 
     public EntityType type() {
@@ -100,6 +122,8 @@ public class MobProperties {
             double dropChance = (double) lootJson.get("dropChance");
             lootList.add(new Loot(itemStack, dropChance));
         }
+        double coinChance = (double) json.get("coinChance");
+        int coinAmount = ((Long) json.get("coinAmount")).intValue();
 
-        return new MobProperties(type, name, health, damage, lootList);
+        return new MobProperties(type, name, health, damage, lootList, coinChance, coinAmount);
     }}

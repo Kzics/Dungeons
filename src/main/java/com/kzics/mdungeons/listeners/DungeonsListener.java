@@ -8,6 +8,7 @@ import com.kzics.mdungeons.menu.MysticDungeonsMenu;
 import com.kzics.mdungeons.mobs.Loot;
 import com.kzics.mdungeons.mobs.SpawnPoint;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -55,6 +56,15 @@ public class DungeonsListener implements Listener {
                 if (spawnPoint.mobProperties().name().equals(entityName)) {
                     event.getDrops().clear();
                     handleLootDrop(entity, spawnPoint);
+
+                    double coinChance = spawnPoint.mobProperties().coinChance();
+
+                    if (random.nextDouble() * 100 <= coinChance) {
+                        Player killer = entity.getKiller();
+                        if(killer == null) return;
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "playerpoints give " + killer.getName() + " " + spawnPoint.mobProperties().coinAmount());
+                        killer.sendMessage(Component.text("You received " + spawnPoint.mobProperties().coinAmount() + " coins.", NamedTextColor.GREEN));
+                    }
                     break;
                 }
             }

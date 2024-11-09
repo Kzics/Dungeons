@@ -1,6 +1,7 @@
 main: com.kzics.mdungeons.MysticDungeons
 name: Dungeons
 version: 1.0
+api-version: 1.20
 commands:
     dungeon:
         description: Dungeon command

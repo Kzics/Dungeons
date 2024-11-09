@@ -67,7 +67,7 @@ public class MobSpawnCommand implements CommandExecutor {
             return true;
         }
 
-        MobProperties mobProperties = new MobProperties(entityType, Component.text(name), 100, 10, new ArrayList<>());
+        MobProperties mobProperties = new MobProperties(entityType, Component.text(name), 100, 10, new ArrayList<>(), 0, 0);
 
         if (spawnPointManager.setSpawnPoint(mobProperties, spawnInterval, radius, player)) {
             player.sendMessage(Component.text("Spawn point set for " + name + " at your WorldEdit selection.", NamedTextColor.GREEN));

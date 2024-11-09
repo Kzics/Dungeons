@@ -47,8 +47,11 @@ public class MobSpawnDetailMenu extends MysticDungeonsMenu {
         inventory.setItem(12, createDetailItem("Damage", String.valueOf(spawnPoint.mobProperties().damage())));
         inventory.setItem(14, createDetailItem("Spawn Interval", String.valueOf(spawnPoint.spawnInterval())));
         inventory.setItem(16, createDetailItem("Radius", String.valueOf(spawnPoint.radius())));
-        inventory.setItem(4,createDetailItem("Loot", "Click to view loot"));
+        inventory.setItem(4, createDetailItem("Loot", "Click to view loot"));
+        inventory.setItem(18, createDetailItem("Coin Chance", String.valueOf(spawnPoint.mobProperties().coinChance())));
+        inventory.setItem(20, createDetailItem("Coin Amount", String.valueOf(spawnPoint.mobProperties().coinAmount())));
     }
+
 
     private ItemStack createDetailItem(String name, String value) {
         ItemStack item = new ItemStack(Material.PAPER);
@@ -102,10 +105,15 @@ public class MobSpawnDetailMenu extends MysticDungeonsMenu {
             case "Radius":
                 spawnPoint.setRadius(Integer.parseInt(newValue));
                 break;
+            case "Coin Chance":
+                spawnPoint.mobProperties().setCoinChance(Double.parseDouble(newValue));
+                break;
+            case "Coin Amount":
+                spawnPoint.mobProperties().setCoinAmount(Integer.parseInt(newValue));
+                break;
         }
         setupMenu();
     }
-
     public static class UpdateContext {
         private final MobSpawnDetailMenu menu;
         private final Consumer<String> updateAction;
